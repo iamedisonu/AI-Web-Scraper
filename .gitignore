@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments (never commit these -- the old repo shipped a
+# whole venv in the `ai/` folder, which is why it was huge)
+.venv/
+venv/
+env/
+ai/
+
+# Browser drivers are downloaded automatically by Selenium Manager
+*.exe
+msedgedriver*
+chromedriver*
+geckodriver*
+
+# Secrets / local config
+.env
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
