@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Web Scraper — clean text from any page</title>
+<meta name="description" content="A web scraper that turns messy web pages into clean, readable text. Browser demo plus a local Selenium + Ollama (AI) version." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕷️</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <div class="badge">🕷️ AI WEB SCRAPER</div>
+    <h1>Turn any web page into<br />clean, usable text.</h1>
+    <p class="tagline">
+      Paste a URL and get the page's title, outline, links and readable text —
+      no ads, no scripts, no clutter. Then extract just the parts you care about.
+    </p>
+    <div class="hero-links">
+      <a class="btn btn-ghost" href="https://github.com/iamedisonu/AI-Web-Scraper" target="_blank" rel="noopener">View the code on GitHub</a>
+      <a class="btn btn-ghost" href="https://github.com/iamedisonu/AI-Web-Scraper#run-the-full-version-locally-selenium--ollama-ai" target="_blank" rel="noopener">Run the full AI version locally</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card scraper-card">
+    <label class="field-label" for="urlInput">Website URL</label>
+    <div class="url-row">
+      <input id="urlInput" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" />
+      <button id="scrapeBtn" class="btn btn-primary">Scrape site</button>
+    </div>
+    <div class="chips">
+      <span class="chips-label">Try:</span>
+      <button class="chip" data-url="https://example.com">example.com</button>
+      <button class="chip" data-url="https://en.wikipedia.org/wiki/Web_scraping">Wikipedia — Web scraping</button>
+      <button class="chip" data-url="https://news.ycombinator.com">Hacker News</button>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <details class="paste-box">
+      <summary>Fetch blocked? Paste the page HTML instead</summary>
+      <p class="hint">Some sites block browser fetching. Open the page, view its source, and paste the HTML here — parsing happens entirely on your device.</p>
+      <textarea id="htmlInput" rows="6" placeholder="<!DOCTYPE html>…"></textarea>
+      <div class="paste-actions">
+        <input id="pasteUrl" type="url" placeholder="Page URL (optional, used to resolve links)" />
+        <button id="parseHtmlBtn" class="btn btn-secondary">Parse pasted HTML</button>
+      </div>
+    </details>
+  </section>
+
+  <section id="results" class="results hidden">
+    <div class="stats" id="stats"></div>
+
+    <div class="card">
+      <h2 id="pageTitle" class="page-title"></h2>
+      <p id="pageDesc" class="page-desc"></p>
+      <p class="page-url">Source: <a id="pageUrl" href="#" target="_blank" rel="noopener"></a> · <span id="fetchRoute"></span></p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="text" role="tab">Cleaned text</button>
+        <button class="tab" data-tab="headings" role="tab">Headings</button>
+        <button class="tab" data-tab="links" role="tab">Links</button>
+        <button class="tab" data-tab="extract" role="tab">Extract</button>
+      </div>
+
+      <div class="tab-panel" data-panel="text">
+        <div class="panel-actions">
+          <button class="btn btn-small" data-download="txt">Download .txt</button>
+          <button class="btn btn-small" data-download="md">Download .md</button>
+          <button class="btn btn-small" data-download="json">Download .json</button>
+          <button class="btn btn-small" id="copyBtn">Copy text</button>
+        </div>
+        <pre id="cleanText" class="clean-text"></pre>
+      </div>
+
+      <div class="tab-panel hidden" data-panel="headings">
+        <ul id="headingList" class="heading-list"></ul>
+      </div>
+
+      <div class="tab-panel hidden" data-panel="links">
+        <ul id="linkList" class="link-list"></ul>
+      </div>
+
+      <div class="tab-panel hidden" data-panel="extract">
+        <label class="field-label" for="extractInput">What are you looking for?</label>
+        <div class="url-row">
+          <input id="extractInput" type="text" placeholder="e.g. price, contact, schedule — separate keywords with commas" />
+          <button id="extractBtn" class="btn btn-primary">Extract</button>
+        </div>
+        <p class="hint">In the browser version this filters paragraphs by keyword. The local version sends the page to a local AI model (Ollama / llama3.1) and you describe what you want in plain words.</p>
+        <p id="extractCount" class="status"></p>
+        <div id="extractResults" class="extract-results"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card mini">
+      <h3>🌐 Browser version — this page</h3>
+      <p>Runs 100% in your browser. Fetches the page (directly, or through a public CORS proxy when a site blocks direct fetching), strips scripts and styles, and shows clean text, the heading outline and every link.</p>
+    </div>
+    <div class="card mini">
+      <h3>💻 Local version — Selenium + AI</h3>
+      <p>The Python app (<code>aiweb.py</code>) drives a real Edge browser with Selenium, so it handles JavaScript-heavy pages, then a local Ollama model extracts exactly what you describe. Nothing leaves your machine.</p>
+    </div>
+    <div class="card mini">
+      <h3>⚖️ Scrape politely</h3>
+      <p>Only scrape pages you're allowed to, respect each site's terms and <code>robots.txt</code>, and don't hammer servers. This tool is for learning and personal projects.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Built by <a href="https://github.com/iamedisonu" target="_blank" rel="noopener">Edison Uwamungu</a> · Python, Selenium, Streamlit &amp; Ollama · <a href="https://github.com/iamedisonu/AI-Web-Scraper" target="_blank" rel="noopener">Source code</a></p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
